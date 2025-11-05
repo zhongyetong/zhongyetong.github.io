@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>小意天天开心</title>
+  <style>
+    /* 基础样式重置 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      background: #f5f5f5;
+      overflow-x: hidden;
+    }
+
+    /* 浮动语录样式 */
+    .message-box {
+      position: fixed; /* 固定定位，随滚动不移动 */
+      padding: 15px 20px;
+      border-radius: 12px; /* 圆角 */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+      font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      color: #333;
+      z-index: 9999; /* 置顶显示 */
+      cursor: pointer; /* 鼠标悬停显示指针，提示可点击关闭 */
+      transition: all 0.5s ease; /* 过渡动画 */
+      opacity: 0; /* 初始透明（用于淡入） */
+    }
+
+    /* 点击关闭时的淡出动画 */
+    .message-box.fade-out {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // 温馨语录列表
+    const messages = [
+      "小意多喝热水哦~", "小意保持微笑呀", "小意每天都要元气满满",
+      "小意记得吃水果", "小意保持好心情", "小意好好爱自己",
+      "小意梦想成真", "小意期待下一次见面", "小意顺顺利利",
+      "小意早点休息", "小意愿所有烦恼都消失", "小意别熬夜",
+      "小意今天过得开心吗", "小意记得多穿衣服", "小意天天开心"
+    ];
+
+    // 柔和背景色（莫兰迪色系）
+    const bgColors = [
+      '#FFEFD5', '#FFDAB9', '#F0E68C', '#E6E6FA', '#D8BFD8',
+      '#B0E2FF', '#98FB98', '#FFB6C1', '#87CEFA', '#9ACD32',
+      '#F0FFF0', '#FAF0E6', '#F5F5DC', '#FFF0F5', '#E0FFFF'
+    ];
+
+    // 文字颜色（与背景色对比适中）
+    const textColors = [
+      '#8B4513', '#4682B4', '#2E8B57', '#8A2BE2', '#CD5C5C',
+      '#006400', '#8B0000', '#483D8B', '#008B8B', '#DAA520'
+    ];
+
+    // 创建单个浮动语录
+    function createMessageBox() {
+      // 创建元素
+      const box = document.createElement('div');
+      box.className = 'message-box';
+
+      // 随机内容和样式
+      box.innerText = messages[Math.floor(Math.random() * messages.length)];
+      box.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+      box.style.color = textColors[Math.floor(Math.random() * textColors.length)];
+
+      // 随机位置（避免超出屏幕）
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      const x = Math.random() * (screenWidth - 250) + 50; // 左右留边50px
+      const y = Math.random() * (screenHeight - 100) + 50; // 上下留边50px
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+
+      // 添加到页面
+      document.body.appendChild(box);
+
+      // 淡入动画（延迟10ms触发，确保元素已渲染）
+      setTimeout(() => {
+        box.style.opacity = '0.9'; // 轻微透明
+      }, 10);
+
+      // 点击关闭
+      box.addEventListener('click', () => {
+        box.classList.add('fade-out');
+        setTimeout(() => box.remove(), 500); // 等待动画结束后移除
+      });
+
+      // 5秒后自动消失
+      setTimeout(() => {
+        box.classList.add('fade-out');
+        setTimeout(() => box.remove(), 500);
+      }, 5000);
+    }
+
+    // 批量创建浮动语录（间隔生成，避免扎堆）
+    function createMultipleBoxes(count = 20, interval = 300) {
+      for (let i = 0; i < count; i++) {
+        setTimeout(createMessageBox, i * interval);
+      }
+    }
+
+    // 页面加载后开始创建
+    window.onload = () => {
+      createMultipleBoxes(200, 50); // 创建15个，间隔400ms
+    };
+  </script>
+</body>
+</html>
