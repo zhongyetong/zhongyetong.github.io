@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>小意天天开心</title>
   <style>
     /* 基础样式重置 */
@@ -14,38 +15,127 @@
       min-height: 100vh;
       background: #f5f5f5;
       overflow-x: hidden;
+      /* 增加背景质感 */
+      background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+      background-size: 20px 20px;
     }
 
-    /* 浮动语录样式 */
-    .message-box {
-      position: fixed; /* 固定定位，随滚动不移动 */
-      padding: 15px 20px;
-      border-radius: 12px; /* 圆角 */
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+    /* 进入页面弹窗样式 */
+    .welcome-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000; /* 层级高于浮动语录 */
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s ease;
+    }
+
+    .welcome-modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 30px 20px;
+      border-radius: 16px;
+      max-width: 85%;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      transform: translateY(20px);
+      transition: transform 0.5s ease;
+    }
+
+    .welcome-modal.show .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-title {
       font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
-      font-size: 14px;
+      font-size: 20px;
+      color: #ff6b8b;
+      margin-bottom: 15px;
+    }
+
+    .modal-message {
+      font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
       color: #333;
-      z-index: 9999; /* 置顶显示 */
-      cursor: pointer; /* 鼠标悬停显示指针，提示可点击关闭 */
-      transition: all 0.5s ease; /* 过渡动画 */
-      opacity: 0; /* 初始透明（用于淡入） */
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .modal-btn {
+      background-color: #ff6b8b;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+    }
+
+    .modal-btn:active {
+      transform: scale(0.95);
+      background-color: #ff4d75;
+    }
+
+    /* 浮动语录样式 - 适配手机 */
+    .message-box {
+      position: fixed;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+      font-size: 14px; /* 适合手机阅读的字体大小 */
+      color: #333;
+      z-index: 9999;
+      cursor: pointer;
+      transition: all 0.5s ease;
+      opacity: 0;
+      max-width: 80%; /* 限制最大宽度，避免超出屏幕 */
+      word-break: break-word; /* 自动换行 */
     }
 
     /* 点击关闭时的淡出动画 */
     .message-box.fade-out {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(15px);
+    }
+
+    /* 触摸反馈效果 */
+    .message-box:active {
+      transform: scale(0.95);
     }
   </style>
 </head>
 <body>
+  <!-- 欢迎弹窗 -->
+  <div class="welcome-modal">
+    <div class="modal-content">
+      <h3 class="modal-title">💖 小意ovo，欢迎来到这里</h3>
+      <p class="modal-message">愿这里的每一句话，都能带给你温暖和快乐~</p>
+      <button class="modal-btn">开始接收祝福</button>
+    </div>
+  </div>
+
   <script>
     // 温馨语录列表
     const messages = [
       "小意多喝热水哦~", "小意保持微笑呀", "小意每天都要元气满满",
       "小意记得吃水果", "小意保持好心情", "小意好好爱自己",
-      "小意梦想成真", "小意期待下一次见面", "小意顺顺利利",
-      "小意早点休息", "小意愿所有烦恼都消失", "小意别熬夜",
+      "小意梦想成真",  "小意顺顺利利",
+      "小意早点休息", "愿小意所有烦恼都消失", "小意别熬夜",
       "小意今天过得开心吗", "小意记得多穿衣服", "小意天天开心"
     ];
 
@@ -73,46 +163,72 @@
       box.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
       box.style.color = textColors[Math.floor(Math.random() * textColors.length)];
 
-      // 随机位置（避免超出屏幕）
+      // 随机位置（适配手机屏幕）
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
-      const x = Math.random() * (screenWidth - 250) + 50; // 左右留边50px
-      const y = Math.random() * (screenHeight - 100) + 50; // 上下留边50px
+      // 左右留更大边距，避免在手机边缘
+      const x = Math.random() * (screenWidth - 160) + 20; 
+      const y = Math.random() * (screenHeight - 100) + 40;
       box.style.left = `${x}px`;
       box.style.top = `${y}px`;
 
       // 添加到页面
       document.body.appendChild(box);
 
-      // 淡入动画（延迟10ms触发，确保元素已渲染）
+      // 淡入动画
       setTimeout(() => {
-        box.style.opacity = '0.9'; // 轻微透明
+        box.style.opacity = '0.95';
       }, 10);
 
-      // 点击关闭
+      // 点击/触摸关闭
       box.addEventListener('click', () => {
         box.classList.add('fade-out');
-        setTimeout(() => box.remove(), 500); // 等待动画结束后移除
+        setTimeout(() => box.remove(), 500);
       });
 
-      // 5秒后自动消失
+      // 手机上停留时间稍短，避免过多堆积
       setTimeout(() => {
         box.classList.add('fade-out');
-        setTimeout(() => box.remove(), 500);
-      }, 5000);
+        setTimeout(() => box.remove(), 800);
+      }, 4000);
     }
 
-    // 批量创建浮动语录（间隔生成，避免扎堆）
-    function createMultipleBoxes(count = 20, interval = 300) {
+    // 批量创建浮动语录（手机上调整间隔和数量）
+    function createMultipleBoxes(count = 50, interval = 200) {
       for (let i = 0; i < count; i++) {
         setTimeout(createMessageBox, i * interval);
       }
     }
 
-    // 页面加载后开始创建
+    // 弹窗相关逻辑
+    const welcomeModal = document.querySelector('.welcome-modal');
+    const modalBtn = document.querySelector('.modal-btn');
+
+    // 页面加载后显示弹窗
     window.onload = () => {
-      createMultipleBoxes(200, 50); // 创建15个，间隔400ms
+      setTimeout(() => {
+        welcomeModal.classList.add('show');
+      }, 300); // 轻微延迟，让弹窗显示更自然
     };
+
+    // 点击按钮关闭弹窗并开始显示语录
+    modalBtn.addEventListener('click', () => {
+      welcomeModal.classList.remove('show');
+      // 弹窗消失后再显示语录，增加过渡效果
+      setTimeout(() => {
+        createMultipleBoxes(100, 50);
+      }, 500);
+    });
+
+    // 适配屏幕旋转
+    window.addEventListener('resize', () => {
+      // 移除所有现有元素，重新生成
+      document.querySelectorAll('.message-box').forEach(box => box.remove());
+      // 只有在弹窗关闭后才重新生成语录
+      if (!welcomeModal.classList.contains('show')) {
+        createMultipleBoxes(100, 50);
+      }
+    });
   </script>
 </body>
 </html>
