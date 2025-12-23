@@ -204,14 +204,14 @@
     const welcomeModal = document.querySelector('.welcome-modal');
     const modalBtn = document.querySelector('.modal-btn');
 
-    // 页面加载后显示弹窗
+    // 页面加载后仅显示欢迎弹窗，不生成语录
     window.onload = () => {
       setTimeout(() => {
         welcomeModal.classList.add('show');
       }, 300); // 轻微延迟，让弹窗显示更自然
     };
 
-    // 点击按钮关闭弹窗并开始显示语录
+    // 只有点击按钮后，才关闭弹窗并开始生成浮动语录
     modalBtn.addEventListener('click', () => {
       welcomeModal.classList.remove('show');
       // 弹窗消失后再显示语录，增加过渡效果
@@ -220,11 +220,11 @@
       }, 500);
     });
 
-    // 适配屏幕旋转
+    // 适配屏幕旋转（仅在已点击按钮后，重新生成语录）
     window.addEventListener('resize', () => {
-      // 移除所有现有元素，重新生成
+      // 移除所有现有元素
       document.querySelectorAll('.message-box').forEach(box => box.remove());
-      // 只有在弹窗关闭后才重新生成语录
+      // 只有当欢迎弹窗已关闭（即用户已点击按钮），才重新生成语录
       if (!welcomeModal.classList.contains('show')) {
         createMultipleBoxes(100, 50);
       }
@@ -232,5 +232,3 @@
   </script>
 </body>
 </html>
-
-
